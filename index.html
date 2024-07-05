@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MP3 Music Publisher App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>MP3 Music Publisher App</h1>
+        <form id="uploadForm">
+            <input type="file" id="mp3File" accept="audio/*" required>
+            <input type="text" id="publisherName" placeholder="Publisher Name" required>
+            <button type="submit">Add Music</button>
+        </form>
+        <div class="music-list" id="musicList">
+            <h2>Music List</h2>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+    const uploadForm = document.getElementById("uploadForm");
+    const musicList = document.getElementById("musicList");
+
+    // Load saved music from local storage
+    const savedMusic = JSON.parse(localStorage.getItem("musicList")) || [];
+    savedMusic.forEach(music => addMusicToDOM(music));
+
+    uploadForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+        const mp3File = document.getElementById("mp3File").files[0];
+        const publisherName = document.getElementById("publisherName").value;
+
+        if (mp3File && publisherName) {
+            const musicItem = {
+                id: Date.now(),
+                file: mp3File.name,
+                publisher: publisherName,
+                fileURL: URL.createObjectURL(mp3File)
+            };
+
+            addMusicToDOM(musicItem);
+            saveMusicToLocalStorage(musicItem);
+
+            // Reset the form
+            uploadForm.reset();
+        }
+    });
+
+    function addMusicToDOM(musicItem) {
+        const musicDiv = document.createElement("div");
+        musicDiv.className = "music-item";
+        musicDiv.dataset.id = musicItem.id;
+
+        const audio = document.createElement("audio");
+        audio.controls = true;
+        audio.src = musicItem.fileURL;
+
+        const publisher = document.createElement("p");
+        publisher.textContent = `Publisher: ${musicItem.publisher}`;
+
+        musicDiv.appendChild(audio);
+        musicDiv.appendChild(publisher);
+
+        musicList.appendChild(musicDiv);
+    }
+
+    function saveMusicToLocalStorage(musicItem) {
+        const savedMusic = JSON.parse(localStorage.getItem("musicList")) || [];
+        savedMusic.push(musicItem);
+        localStorage.setItem("musicList", JSON.stringify(savedMusic));
+    }
+});
+
+    </script>
+</body>
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+form input {
+    padding: 10px;
+    margin: 10px 0;
+    width: calc(100% - 22px);
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+form button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #0056b3;
+}
+
+.music-list {
+    margin-top: 20px;
+}
+
+.music-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.music-item audio {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.music-item p {
+    margin: 0;
+}
+
+</style>
+</html>
